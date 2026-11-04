@@ -39,16 +39,16 @@ const tireGeometry=new THREE.LatheGeometry(tireProfile,32);
 const innerGeometry=new THREE.CylinderGeometry(.235,.235,.20,32,1,true);
 const markerGeometry=new THREE.CylinderGeometry(.34,.34,.025,32);
 function init3d(){
- scene=new THREE.Scene();scene.background=new THREE.Color(0x142333);scene.fog=new THREE.Fog(0x142333,30,90);
+ scene=new THREE.Scene();scene.background=new THREE.Color(0x101820);scene.fog=new THREE.Fog(0x101820,30,90);
  camera=new THREE.PerspectiveCamera(55,1,.1,160);
  renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:'high-performance'});
  renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.75));renderer.outputColorSpace=THREE.SRGBColorSpace;
- renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.65;
- scene.add(new THREE.HemisphereLight(0xb9dbff,0x29303a,2.5));
- const light=new THREE.DirectionalLight(0xffffff,3);light.position.set(-6,15,12);scene.add(light);
- const fill=new THREE.DirectionalLight(0x9acaff,1.4);fill.position.set(7,7,-12);scene.add(fill);
- const floor=new THREE.Mesh(new THREE.PlaneGeometry(13,44),new THREE.MeshStandardMaterial({color:0x435362,roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-.04;scene.add(floor);
- const wallmat=new THREE.MeshStandardMaterial({color:0x1c2b3d,roughness:1,side:THREE.DoubleSide});
+ renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
+ scene.add(new THREE.HemisphereLight(0x9bb3cc,0x1a2029,1.5));
+ const light=new THREE.DirectionalLight(0xffffff,1.8);light.position.set(-6,15,12);scene.add(light);
+ const fill=new THREE.DirectionalLight(0x9acaff,0.65);fill.position.set(7,7,-12);scene.add(fill);
+ const floor=new THREE.Mesh(new THREE.PlaneGeometry(13,44),new THREE.MeshStandardMaterial({color:0x242c35,roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-.04;scene.add(floor);
+ const wallmat=new THREE.MeshStandardMaterial({color:0x111a25,roughness:1,side:THREE.DoubleSide});
  for(const x of [-5.8,5.8]){let wall=new THREE.Mesh(new THREE.PlaneGeometry(44,6),wallmat);wall.rotation.y=Math.PI/2;wall.position.set(x,3,0);scene.add(wall)}
  tireRoot=new THREE.Group();scene.add(tireRoot);buildStacks();animate();
 }
@@ -100,7 +100,7 @@ canvas.addEventListener('touchmove',e=>{if(e.touches.length===2){moved=true;cons
 canvas.addEventListener('touchend',()=>{pinch=0});
 $('resetView').onclick=resetCamera;
 if(typeof THREE==='undefined'){$('status').textContent='3D-Bibliothek konnte nicht geladen werden. Internetverbindung prüfen.'}
-else{init3d();render();$('status').textContent='Massive 3D-Reifen ohne Profil · Kamera im Mittelgang · 37 geprüfte Korrekturen';}
+else{init3d();render();$('status').textContent='Massive 3D-Reifen ohne Profil · Dunkle Wände und Boden · 37 geprüfte Korrekturen';}
 if('serviceWorker' in navigator)navigator.serviceWorker.getRegistrations().then(rs=>Promise.all(rs.filter(r=>r.active&&r.active.scriptURL.includes('/sw.js')).map(r=>r.unregister()))).catch(()=>{});
 }
 </script></body></html>
