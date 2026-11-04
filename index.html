@@ -1,6 +1,6 @@
-<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>WerkstattOS | Reifenlager 3D Online</title><meta name="theme-color" content="#101a29"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><style>
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>WerkstattOS | Reifenlager 3D WebGL</title><meta name="theme-color" content="#101a29"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><style>
 :root{color-scheme:dark;--bg:#0a101c;--panel:#141e2d;--line:#2c3c51;--accent:#51d6ff;--muted:#a4b3c5}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#eaf3ff;font:14px system-ui,-apple-system,sans-serif}header{padding:16px 18px;background:#101a29;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}h1{font-size:19px;margin:0}small,.muted{color:var(--muted)}button,input,select{font:inherit}button{background:#21334a;color:#eaf3ff;border:1px solid #39536b;padding:10px 12px;border-radius:10px;cursor:pointer}button.primary{background:#007eab;border-color:#16b9ed;font-weight:700}button.danger{background:#572a34}input,select{background:#0c1726;color:white;border:1px solid #3a5269;border-radius:9px;padding:11px;width:100%}main{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:14px;padding:14px;max-width:1600px;margin:auto}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}.tools{display:flex;gap:8px;flex-wrap:wrap;padding:12px}.tools input{flex:1;min-width:0}.search-wrap{display:flex;flex:1;min-width:170px;position:relative}.search-wrap input{padding-right:43px}.search-clear{position:absolute;right:5px;top:50%;transform:translateY(-50%);padding:5px 9px;border:0;background:#31445a;font-size:18px;line-height:1;border-radius:7px}.search-clear:disabled{opacity:.35;cursor:default}.viewer{height:60vh;min-height:360px;position:relative;background:radial-gradient(circle at 50% 20%,#26394d,#0c1420 75%)}#scene{width:100%;height:100%;display:block;touch-action:none}.hint{position:absolute;bottom:10px;left:10px;background:#0c1524cf;padding:8px 10px;border-radius:8px;font-size:12px;pointer-events:none}.side{padding:16px;max-height:calc(60vh + 85px);overflow:auto}h2{font-size:16px;margin:0 0 12px}.stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat div{background:#0d1828;padding:12px 5px;text-align:center;border-radius:9px}.stat b{display:block;font-size:22px;color:var(--accent)}.field{margin:12px 0}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}.actions button{flex:1}.list{padding:14px;margin-top:14px}.entry{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px;border-bottom:1px solid var(--line);cursor:pointer}.entry:hover{background:#23374b}.entry strong{display:block}.tag{font-size:11px;padding:4px 7px;border-radius:6px;background:#264353;white-space:nowrap}.warn{color:#ffcd7c}.notice{padding:10px 14px;color:#a4b3c5;font-size:12px}.tabs{display:flex;gap:6px;margin:12px 0}#status{font-size:12px;color:#a4b3c5;padding:6px 14px}@media(max-width:850px){main{display:block;padding:8px}.viewer{height:48vh;min-height:300px}.side{max-height:none;margin-top:10px}.list{margin-top:10px}header{padding:12px}h1{font-size:16px}}
-#focusLabel{position:absolute;top:12px;left:50%;transform:translateX(-50%);background:#071421ed;border:1px solid #51d6ff88;border-radius:12px;padding:10px 18px;text-align:center;z-index:3;min-width:190px;box-shadow:0 5px 25px #0007;pointer-events:none}#focusLabel b{display:block;font-size:19px;color:#7de5ff}#focusLabel small{display:block;margin-top:3px}#focusLabel:empty{display:none}.viewer{overflow:hidden}</style></head><body><header><div><h1>🔧 WerkstattOS <span style="color:#51d6ff">Reifenlager 3D</span></h1><small>2 Wände · Mittelgang · je 2 Reifensätze übereinander</small></div><button id="export">Backup ↓</button></header><main><section><div class="panel"><div class="tools"><div class="search-wrap"><input id="search" placeholder="🔎 Kennzeichen, Größe oder Lagerplatz suchen" autocomplete="off"><button id="clearSearch" class="search-clear" type="button" aria-label="Suche löschen" title="Suche löschen">×</button></div><button id="resetView">Ansicht</button><button id="new" class="primary">+ Einlagern</button></div><div class="viewer"><canvas id="scene"></canvas><div id="focusLabel"></div><div class="hint">Stapel antippen: Ansicht von vorne · Ziehen: drehen · Pinch: zoomen · Oben/unten antippen</div></div><div id="status">Offline-3D-Ansicht wird gestartet …</div></div><div class="panel list"><b>Reifensätze (unten / oben)</b><div class="tabs"><button data-filter="all">Alle</button><button data-filter="1">Reihe 1</button><button data-filter="2">Reihe 2</button><button data-filter="review">Prüfen</button></div><div id="results"></div></div></section><aside class="panel side"><h2 id="formTitle">Lagerplatz auswählen</h2><div class="stat"><div><b id="count">0</b><small>Belegt</small></div><div><b id="free">0</b><small>Frei</small></div><div><b id="reviewCount">0</b><small>Prüfen</small></div></div><p class="muted">Wähle einen Stapel in der 3D-Ansicht oder suche nach einem Kennzeichen.</p><div class="field"><label>Reihe</label><select id="row"><option value="1">Reihe 1</option><option value="2">Reihe 2</option></select></div><div class="field"><label>Stapelplatz (12 = unten, 12.1 = oben)</label><input id="slot" placeholder="12.1"></div><div class="field"><label>Kennzeichen / Kundenname</label><input id="plate" placeholder="EIC-AB 123"></div><div class="field"><label>Reifengröße</label><input id="size" placeholder="205/55 R16 91V"></div><div class="field"><label>Reifen / Zustand / Bemerkungen</label><input id="note" placeholder="2x neu, Winterreifen …"></div><div class="field"><label>Status</label><select id="state"><option value="stored">Eingelagert</option><option value="free">Leer / ausgelagert</option><option value="review">Angaben prüfen</option></select></div><div class="actions"><button id="save" class="primary">Speichern</button><button id="clear" class="danger">Auslagern</button></div><div class="actions"><button id="import">Backup importieren</button><input id="file" type="file" accept="application/json" hidden></div><p class="notice">Änderungen werden lokal in diesem Browser gespeichert. Für gemeinsame Nutzung auf mehreren Geräten ist später eine Datenbank nötig.</p></aside></main>
+#focusLabel{position:absolute;top:12px;left:50%;transform:translateX(-50%);background:#071421ed;border:1px solid #51d6ff88;border-radius:12px;padding:10px 18px;text-align:center;z-index:3;min-width:190px;box-shadow:0 5px 25px #0007;pointer-events:none}#focusLabel b{display:block;font-size:19px;color:#7de5ff}#focusLabel small{display:block;margin-top:3px}#focusLabel:empty{display:none}.viewer{overflow:hidden}</style></head><body><header><div><h1>🔧 WerkstattOS <span style="color:#51d6ff">Reifenlager 3D</span></h1><small>2 Wände · Mittelgang · je 2 Reifensätze übereinander</small></div><button id="export">Backup ↓</button></header><main><section><div class="panel"><div class="tools"><div class="search-wrap"><input id="search" placeholder="🔎 Kennzeichen, Größe oder Lagerplatz suchen" autocomplete="off"><button id="clearSearch" class="search-clear" type="button" aria-label="Suche löschen" title="Suche löschen">×</button></div><button id="resetView">Ansicht</button><button id="new" class="primary">+ Einlagern</button></div><div class="viewer"><canvas id="scene"></canvas><div id="focusLabel"></div><div class="hint">Stapel antippen: Ansicht von vorne · Ziehen: drehen · Pinch: zoomen · Oben/unten antippen</div></div><div id="status">Echte 3D-Ansicht wird gestartet …</div></div><div class="panel list"><b>Reifensätze (unten / oben)</b><div class="tabs"><button data-filter="all">Alle</button><button data-filter="1">Reihe 1</button><button data-filter="2">Reihe 2</button><button data-filter="review">Prüfen</button></div><div id="results"></div></div></section><aside class="panel side"><h2 id="formTitle">Lagerplatz auswählen</h2><div class="stat"><div><b id="count">0</b><small>Belegt</small></div><div><b id="free">0</b><small>Frei</small></div><div><b id="reviewCount">0</b><small>Prüfen</small></div></div><p class="muted">Wähle einen Stapel in der 3D-Ansicht oder suche nach einem Kennzeichen.</p><div class="field"><label>Reihe</label><select id="row"><option value="1">Reihe 1</option><option value="2">Reihe 2</option></select></div><div class="field"><label>Stapelplatz (12 = unten, 12.1 = oben)</label><input id="slot" placeholder="12.1"></div><div class="field"><label>Kennzeichen / Kundenname</label><input id="plate" placeholder="EIC-AB 123"></div><div class="field"><label>Reifengröße</label><input id="size" placeholder="205/55 R16 91V"></div><div class="field"><label>Reifen / Zustand / Bemerkungen</label><input id="note" placeholder="2x neu, Winterreifen …"></div><div class="field"><label>Status</label><select id="state"><option value="stored">Eingelagert</option><option value="free">Leer / ausgelagert</option><option value="review">Angaben prüfen</option></select></div><div class="actions"><button id="save" class="primary">Speichern</button><button id="clear" class="danger">Auslagern</button></div><div class="actions"><button id="import">Backup importieren</button><input id="file" type="file" accept="application/json" hidden></div><p class="notice">Änderungen werden lokal in diesem Browser gespeichert. Für gemeinsame Nutzung auf mehreren Geräten ist später eine Datenbank nötig.</p></aside></main>
 <script>
 const source=[
 [1,'1','EF-RZ 549','','2017'],[1,'1.1','EIC-M 237','205/55 R16 91V','2x neu VA'],[1,'2','WBS-PT 1'],[1,'2.1','EIC-QA 338','215/60 R16 95V','2x porös; 2018'],[1,'3','EIC-CD 121'],[1,'3.1','WBS-WP 111'],[1,'4','EIC-KC 282'],[1,'4.1','EIC-RL 99','225/50 R17 98Y','2x neu'],[1,'5','EIC-RP 33','225/55 R18 98V','2x neu'],[1,'5.1','EIC-SC 312','245/45 R18 100W','2x neu'],[1,'6','GÖ-NL 925'],[1,'6.1','HBN-S 7102','245/35 ZR20 95Y','2x neu'],[1,'7','EIC-FD 108'],[1,'7.1','EIC-FI 318'],[1,'8','EIC-KC 312'],[1,'8.1','EIC-X 870'],[1,'9','EIC-WO 308'],[1,'9.1','UH-XX 606'],[1,'10','EIC-IK 310'],[1,'10.1','EIC-VK 510'],[1,'11','EIC-RP 102'],[1,'11.1','EIC-MO 777'],[1,'12','EIC-JG 111','215/55 R18 95H','2x neu'],[1,'12.1','WBS-J 89'],[1,'13','EIC-NK 666','255/40 R19 95Y','2x neu'],[1,'13.1','EIC-DV 666','225/55 R18 102V','2x neu'],[1,'14','HIG-MT 12'],[1,'14.1','DUD-A 669'],[1,'15','CHEF Q8','235/45 R21 101T; 255/40 R21 102T','4x neu'],[1,'15.1','EIC-RR 8'],[1,'16','WA-IE 11'],[1,'16.1','EIC-G 288','235/35 R19 91Y','2x neu'],[1,'17','WBS-RM 576'],[1,'17.1','EIC-BS 788','215/45 R16 86H','VR kaputt; 2016'],[1,'18','EIC-AC 704'],[1,'18.1','EIC-EK 112','215/45 R16 90V','2x neu'],[1,'19','ZE-M 100'],[1,'19.1','Andrea'],[1,'20','EIC-NN 92','215/55 R18 95V','2x neu; 2018'],[1,'20.1','EIC-MC 84'],[1,'21','EIC-QT 578'],[1,'21.1','WBS-TA 588'],[1,'22','K-P 280'],[1,'22.1','EIC-QS 897'],[1,'23','EIC-RT 333'],[1,'23.1','EIC-MD 919'],[1,'24','L-ZZ 364'],[1,'24.1','EIC-WT 333'],[1,'25','EIC-SR 505'],[1,'25.1','EIC-XX 350'],[1,'26','EIC-EC 2','235/45 R18 98W','2x neu'],[1,'26.1','EIC-QX 162'],
@@ -13,49 +13,100 @@ else {let changed=false;for(const item of data){const c=corrections[item.row+':'
 const $=id=>document.getElementById(id);let selected=null,filter='all';const id=(r,s)=>r+':'+s;const persist=()=>{localStorage.setItem(key,JSON.stringify(data));render()};const slotOrder=(a,b)=>Number(a.slot)-Number(b.slot);function get(r,s){return data.find(x=>x.row==r&&x.slot===s)}function choose(r,s){selected=id(r,s);let e=get(r,s)||{row:r,slot:s,plate:'',size:'',note:'',state:'free'};['row','slot','plate','size','note'].forEach(k=>$(k).value=e[k]);$('state').value=e.state;$('formTitle').textContent=`Reihe ${r} · Stapel ${s.split(".")[0]} · ${s.endsWith(".1")?"oben":"unten"}`;render();highlight();focusSlot(r,s)}
 function render(){$('clearSearch').disabled=!$('search').value;let q=$('search').value.toLowerCase().trim();let occupied=data.filter(x=>x.state!=='free'&&x.plate).length;let max=2*(26+35);$('count').textContent=occupied;$('free').textContent=Math.max(0,max-occupied);$('reviewCount').textContent=data.filter(x=>x.state==='review').length;let rows=data.filter(x=>(filter==='all'||(filter==='review'?x.state==='review':String(x.row)===filter))&&[x.plate,x.size,x.slot,x.note,'Reihe '+x.row].join(' ').toLowerCase().includes(q)).sort((a,b)=>a.row-b.row||slotOrder(a,b));$('results').innerHTML=rows.map(x=>`<div class="entry" data-r="${x.row}" data-s="${x.slot}"><div><strong>${esc(x.plate||'Leer')}</strong><small>Reihe ${x.row} · Stapel ${esc(x.slot.split(".")[0])} ${x.slot.endsWith(".1")?"oben":"unten"} ${x.size?'· '+esc(x.size):''}</small></div><span class="tag ${x.state==='review'?'warn':''}">${x.state==='review'?'Prüfen':x.state==='free'?'Leer':'OK'}</span></div>`).join('')||'<p class="muted">Keine Treffer.</p>';document.querySelectorAll('.entry').forEach(el=>el.onclick=()=>choose(+el.dataset.r,el.dataset.s));updateColors()}
 function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.filter;render()});function resetCamera(){if(!scene)return;rot=.2;tilt=.58;desiredZoom=52;desiredTarget.set(0,0,0);$('focusLabel').innerHTML=''}function clearSearch(){ $('search').value='';selected=null;render();highlight();resetCamera();$('search').focus()}$('clearSearch').onclick=clearSearch;$('search').oninput=()=>{render();highlight();let q=$('search').value.trim().toLowerCase();if(!q){selected=null;resetCamera();render();return}if(q){let matches=data.filter(x=>[x.plate,x.size,x.slot,'Reihe '+x.row].join(' ').toLowerCase().includes(q));if(matches.length===1)focusSlot(matches[0].row,matches[0].slot)}};$('new').onclick=()=>{selected=null;['slot','plate','size','note'].forEach(k=>$(k).value='');$('state').value='stored';$('formTitle').textContent='Neuen Reifensatz einlagern'};$('save').onclick=()=>{let row=+$('row').value,slot=$('slot').value.trim().replace(',','.'),plate=$('plate').value.trim();if(!/^(?:[1-9]|[12]\d|3[0-5])(?:\.1)?$/.test(slot)||Number(slot.split('.')[0])>(row===1?26:35)){alert('Ungültiger Lagerplatz für diese Reihe.');return}if(!plate&&$('state').value!=='free'){alert('Kennzeichen oder Kundenname fehlt.');return}let existing=get(row,slot);if(existing&&selected!==id(row,slot)&&existing.plate&&existing.state!=='free'&&!confirm('Dieser Platz ist belegt. Überschreiben?'))return;let e={row,slot,plate,size:$('size').value.trim(),note:$('note').value.trim(),state:$('state').value};if(selected&&selected!==id(row,slot)){let old=data.findIndex(x=>id(x.row,x.slot)===selected);if(old>=0)data.splice(old,1)}let i=data.findIndex(x=>id(x.row,x.slot)===id(row,slot));if(i>=0)data[i]=e;else data.push(e);selected=id(row,slot);persist();buildStacks();choose(row,slot)};$('clear').onclick=()=>{let r=+$('row').value,s=$('slot').value.trim();if(!get(r,s)||!confirm(`Reihe ${r}, Platz ${s} auslagern?`))return;data=data.filter(x=>id(x.row,x.slot)!==id(r,s));selected=null;persist();buildStacks();$('formTitle').textContent='Reifensatz ausgelagert'};$('export').onclick=()=>{let blob=new Blob([JSON.stringify({app:'WerkstattOS Reifenlager',version:1,exported:new Date().toISOString(),data},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='reifenlager-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};$('import').onclick=()=>$('file').click();$('file').onchange=async e=>{try{let j=JSON.parse(await e.target.files[0].text());if(!Array.isArray(j.data)||!confirm('Aktuelle Lagerdaten durch Backup ersetzen?'))return;data=j.data;persist();buildStacks()}catch{alert('Ungültige Backup-Datei')}};
-</script><script>
-// Offline-3D-Darstellung: eigene perspektivische Canvas-Engine, keine externen Abhängigkeiten.
-let scene=true, stacks=[], rot=.22,tilt=.58,zoom=52,desiredZoom=52,drag=false,moved=false,lastX=0,lastY=0;
-const desiredTarget={x:0,y:1.5,z:0},target={x:0,y:1.5,z:0};
-const canvas=$('scene'),ctx=canvas.getContext('2d');let hitAreas=[];
-function resetCamera(){rot=.22;tilt=.58;desiredZoom=52;Object.assign(desiredTarget,{x:0,y:1.5,z:0});$('focusLabel').textContent=''}
-function focusSlot(r,s){let n=Number(String(s).split('.')[0]),upper=String(s).endsWith('.1');Object.assign(desiredTarget,{x:r===1?-5.8:5.8,y:upper?2.35:.95,z:20-(n-1)*1.16});desiredZoom=5.2;rot=r===1?-Math.PI/2:Math.PI/2;tilt=.12;let e=get(r,s);$('focusLabel').innerHTML='<b>Reihe '+r+' · Platz '+n+'</b><small>'+(upper?'Oben':'Unten')+(e?.plate?' · '+esc(e.plate):' · Leer')+'</small>'}
-function buildStacks(){stacks=[];for(let row of [1,2])for(let i=1;i<=(row===1?26:35);i++)for(let half=0;half<2;half++){let slot=String(i)+(half?'.1':''),entry=get(row,slot);if(!entry||entry.state==='free')continue;stacks.push({row,slot,entry,x:row===1?-5.8:5.8,y:half?1.55:0,z:20-(i-1)*1.16})}draw()}
-function updateColors(){draw()}function highlight(){draw()}
-function project(x,y,z,w,h){let dx=x-target.x,dy=y-target.y,dz=z-target.z;
-// view direction from target toward camera
-let sx=Math.cos(rot)*dx-Math.sin(rot)*dz;
-let depth=Math.sin(rot)*dx+Math.cos(rot)*dz;
-let sy=Math.cos(tilt)*dy-Math.sin(tilt)*depth;
-let forward=Math.sin(tilt)*dy+Math.cos(tilt)*depth;
-let dist=Math.max(.7,zoom-forward);let scale=Math.min(w,h)*1.18/dist;
-return {x:w/2+sx*scale,y:h/2-sy*scale,s:scale,depth:dist}}
-function tire(p,r,selected,matched){
- ctx.save();ctx.translate(p.x,p.y);
- const ry=Math.max(2,r*.32),th=Math.max(3,r*.21);
- // Solid rubber body, with shaded sidewalls and a visible tread edge.
- let shade=ctx.createLinearGradient(-r,0,r,0);
- shade.addColorStop(0,'#10151b');shade.addColorStop(.20,'#252b33');shade.addColorStop(.52,'#303740');shade.addColorStop(.83,'#20262e');shade.addColorStop(1,'#10151b');
- ctx.fillStyle=shade;ctx.beginPath();ctx.moveTo(-r,-ry*.12);ctx.bezierCurveTo(-r*1.04,th*.45,-r*.82,th+ry*.9,0,th+ry*.92);ctx.bezierCurveTo(r*.82,th+ry*.9,r*1.04,th*.45,r,-ry*.12);ctx.closePath();ctx.fill();
- ctx.fillStyle='#171d24';ctx.beginPath();ctx.ellipse(0,th*.63,r,ry,0,0,Math.PI*2);ctx.fill();
- ctx.fillStyle=shade;ctx.beginPath();ctx.ellipse(0,0,r,ry,0,0,Math.PI*2);ctx.fill();
- ctx.strokeStyle='#10151c';ctx.lineWidth=Math.max(1,r*.045);ctx.stroke();
- ctx.fillStyle='#353d46';ctx.beginPath();ctx.ellipse(0,-ry*.16,r*.84,ry*.71,0,0,Math.PI*2);ctx.fill();
- ctx.fillStyle='#121920';ctx.beginPath();ctx.ellipse(0,-ry*.2,r*.32,ry*.38,0,0,Math.PI*2);ctx.fill();
- if(selected||matched){ctx.strokeStyle=selected?'#ff648d':'#5be9b5';ctx.lineWidth=Math.max(2,r*.065);ctx.beginPath();ctx.ellipse(0,0,r*.99,ry,0,0,Math.PI*2);ctx.stroke()}
- ctx.restore();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<script>
+if(typeof THREE === "undefined") { document.getElementById("status").textContent="Three.js konnte nicht geladen werden. Internetverbindung prüfen."; } else {
+// WerkstattOS: echte WebGL-3D-Geometrie, kein 2D-Canvas-Imitat.
+let scene=null,renderer=null,camera=null,stacks=[],rot=.2,tilt=.46,zoom=42,desiredZoom=42;
+const desiredTarget=new THREE.Vector3(0,2,0),target=new THREE.Vector3(0,2,0);
+const canvas=$('scene');const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();
+let tireRoot,drag=false,moved=false,lastX=0,lastY=0,pinch=0;
+const rubber=new THREE.MeshStandardMaterial({color:0x20252d,roughness:.9,metalness:0.02});
+const sidewall=new THREE.MeshStandardMaterial({color:0x303842,roughness:.88});
+const tread=new THREE.MeshStandardMaterial({color:0x151a20,roughness:.98});
+const inner=new THREE.MeshStandardMaterial({color:0x111820,roughness:.92,side:THREE.DoubleSide});
+const gold=new THREE.MeshStandardMaterial({color:0xe5a735,roughness:.5});
+const pink=new THREE.MeshStandardMaterial({color:0xff5b88,emissive:0x9b2049,emissiveIntensity:.2});
+const aqua=new THREE.MeshStandardMaterial({color:0x50d6c2,emissive:0x0b5d51,emissiveIntensity:.15});
+const tireProfile=[
+ [.25,-.135],[.34,-.15],[.44,-.145],[.51,-.12],[.56,-.08],[.57,-.035],
+ [.57,.035],[.56,.08],[.51,.12],[.44,.145],[.34,.15],[.25,.135],
+ [.23,.095],[.23,-.095]
+].map(([r,y])=>new THREE.Vector2(r,y));
+const tireGeometry=new THREE.LatheGeometry(tireProfile,32);
+const treadGrooveGeometry=new THREE.TorusGeometry(.562,.009,6,48);
+const innerGeometry=new THREE.CylinderGeometry(.235,.235,.20,32,1,true);
+const markerGeometry=new THREE.CylinderGeometry(.34,.34,.025,32);
+function init3d(){
+ scene=new THREE.Scene();scene.background=new THREE.Color(0x142333);scene.fog=new THREE.Fog(0x142333,30,90);
+ camera=new THREE.PerspectiveCamera(55,1,.1,160);
+ renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:'high-performance'});
+ renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.75));renderer.outputColorSpace=THREE.SRGBColorSpace;
+ renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.65;
+ scene.add(new THREE.HemisphereLight(0xb9dbff,0x29303a,2.5));
+ const light=new THREE.DirectionalLight(0xffffff,3);light.position.set(-6,15,12);scene.add(light);
+ const fill=new THREE.DirectionalLight(0x9acaff,1.4);fill.position.set(7,7,-12);scene.add(fill);
+ const floor=new THREE.Mesh(new THREE.PlaneGeometry(13,44),new THREE.MeshStandardMaterial({color:0x435362,roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-.04;scene.add(floor);
+ const wallmat=new THREE.MeshStandardMaterial({color:0x1c2b3d,roughness:1,side:THREE.DoubleSide});
+ for(const x of [-5.8,5.8]){let wall=new THREE.Mesh(new THREE.PlaneGeometry(44,6),wallmat);wall.rotation.y=Math.PI/2;wall.position.set(x,3,0);scene.add(wall)}
+ tireRoot=new THREE.Group();scene.add(tireRoot);buildStacks();animate();
 }
-function draw(){if(!ctx)return;let dpr=Math.min(window.devicePixelRatio||1,2),w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr)}ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);let bg=ctx.createLinearGradient(0,0,0,h);bg.addColorStop(0,'#1d3448');bg.addColorStop(1,'#0b1523');ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
-let floor=[[-7,0,-23],[7,0,-23],[7,0,23],[-7,0,23]].map(p=>project(...p,w,h));ctx.beginPath();floor.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.fillStyle='#354654';ctx.fill();ctx.strokeStyle='#6a7a89';ctx.stroke();
-// Position markers and tires, sorted back-to-front
-let q=$('search').value.toLowerCase().trim();hitAreas=[];let items=stacks.map(s=>({...s,p:project(s.x,s.y+.75,s.z,w,h)})).filter(s=>s.p.depth>.3).sort((a,b)=>b.p.depth-a.p.depth);
-for(let s of items){let active=selected===id(s.row,s.slot),matched=q&&[s.entry.plate,s.entry.size,s.entry.note,s.slot,'Reihe '+s.row].join(' ').toLowerCase().includes(q);let r=Math.max(2,Math.min(170,s.p.s*.49));for(let j=0;j<4;j++){let p=project(s.x,s.y+.22+j*.34,s.z,w,h);tire(p,r,active,matched)}let top=project(s.x,s.y+1.55,s.z,w,h);ctx.fillStyle=active?'#ff668a':matched?'#59e5a0':s.entry.state==='review'?'#e5ae54':'#d7a044';ctx.beginPath();ctx.ellipse(top.x,top.y,r*.65,r*.19,0,0,Math.PI*2);ctx.fill();if(r>10){ctx.font=`bold ${Math.min(16,Math.max(10,r*.32))}px system-ui`;ctx.textAlign='center';ctx.fillStyle='#eaf5ff';ctx.fillText(String(s.slot),top.x,top.y-r*.35)}hitAreas.push({x:s.p.x,y:s.p.y,w:r*1.3,h:r*2.3,row:s.row,slot:s.slot,depth:s.p.depth})}
-if(!items.length){ctx.fillStyle='#b3c4d5';ctx.textAlign='center';ctx.fillText('Keine Reifenstapel vorhanden',w/2,h/2)} }
-function tick(){zoom+=(desiredZoom-zoom)*.13;for(let k of ['x','y','z'])target[k]+=(desiredTarget[k]-target[k])*.13;draw();requestAnimationFrame(tick)}
+function makeTire(group,y){
+ const body=new THREE.Mesh(tireGeometry,rubber);body.position.y=y;group.add(body);
+ const liner=new THREE.Mesh(innerGeometry,inner);liner.position.y=y;group.add(liner);
+ for(const dy of [-.055,.055]){const ring=new THREE.Mesh(treadGrooveGeometry,tread);ring.rotation.x=Math.PI/2;ring.position.y=y+dy;group.add(ring)}
+ // Profilblöcke auf dem Umfang: echte räumliche Struktur statt flacher Ellipsen.
+ const lugGeometry=new THREE.BoxGeometry(.075,.19,.085);
+ for(let i=0;i<28;i++){
+  const a=i*Math.PI*2/28;const lug=new THREE.Mesh(lugGeometry,tread);
+  lug.position.set(Math.cos(a)*.567,y,Math.sin(a)*.567);lug.rotation.y=-a;group.add(lug);
+ }
+}
+function buildStacks(){if(!tireRoot)return;
+ while(tireRoot.children.length){const child=tireRoot.children[0];tireRoot.remove(child)}
+ stacks=[];
+ for(let row of [1,2])for(let i=1;i<=(row===1?26:35);i++)for(let half=0;half<2;half++){
+  const slot=String(i)+(half?'.1':''),entry=get(row,slot);if(!entry||entry.state==='free')continue;
+  const group=new THREE.Group();group.position.set(row===1?-4.65:4.65,0,(i-18)*1.08);
+  group.userData={row,slot,entry};
+  for(let k=0;k<4;k++)makeTire(group,.22+(half*4+k)*.31);
+  const marker=new THREE.Mesh(markerGeometry,gold);marker.position.y=.22+(half*4+4)*.31;group.add(marker);group.userData.marker=marker;
+  tireRoot.add(group);stacks.push(group);
+ }
+ updateColors();
+}
+function updateColors(){if(!stacks.length)return;let q=$('search').value.toLowerCase().trim();
+ for(const group of stacks){let {row,slot,entry,marker}=group.userData;
+  let active=selected===id(row,slot),match=q&&[entry.plate,entry.size,entry.note,slot,'Reihe '+row].join(' ').toLowerCase().includes(q);
+  marker.material=active?pink:match?aqua:gold;
+  group.children.forEach(c=>{if(c.geometry===tireGeometry)c.material=active?sidewall:rubber});
+ }
+}
+function highlight(){updateColors()}
+function resetCamera(){rot=.2;tilt=.46;desiredZoom=42;desiredTarget.set(0,2,0);$('focusLabel').innerHTML=''}
+function focusSlot(r,s){const n=Number(String(s).split('.')[0]),upper=String(s).endsWith('.1');
+ desiredTarget.set(r===1?-4.65:4.65,upper?2.0:.75,(n-18)*1.08);
+ desiredZoom=5.4;rot=r===1?-Math.PI/2:Math.PI/2;tilt=.12;
+ const e=get(r,s);$('focusLabel').innerHTML=`<b>Reihe ${r} · Platz ${esc(s)}</b><small>${upper?'Oben':'Unten'} · ${esc(e?.plate||'Leer')}</small>`;
+}
+function animate(){requestAnimationFrame(animate);if(!renderer)return;
+ const w=canvas.clientWidth,h=canvas.clientHeight;if(w<1||h<1)return;
+ const dpr=Math.min(devicePixelRatio||1,1.75);if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
+ zoom+=(desiredZoom-zoom)*.12;target.lerp(desiredTarget,.12);
+ const ct=Math.cos(tilt);camera.position.set(target.x+zoom*Math.sin(rot)*ct,target.y+zoom*Math.sin(tilt),target.z+zoom*Math.cos(rot)*ct);
+ camera.lookAt(target);renderer.render(scene,camera);
+}
+canvas.style.touchAction='none';
 canvas.addEventListener('pointerdown',e=>{drag=true;moved=false;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId)});
-canvas.addEventListener('pointermove',e=>{if(!drag)return;let dx=e.clientX-lastX,dy=e.clientY-lastY;if(Math.abs(dx)+Math.abs(dy)>3)moved=true;rot+=dx*.008;tilt=Math.max(.08,Math.min(1.35,tilt+dy*.005));lastX=e.clientX;lastY=e.clientY});
-canvas.addEventListener('pointerup',e=>{drag=false;if(moved)return;let rect=canvas.getBoundingClientRect(),x=e.clientX-rect.left,y=e.clientY-rect.top;let matches=hitAreas.filter(a=>Math.abs(x-a.x)<a.w&&Math.abs(y-a.y)<a.h).sort((a,b)=>a.depth-b.depth);if(matches.length)choose(matches[0].row,matches[0].slot)});
-canvas.addEventListener('wheel',e=>{e.preventDefault();desiredZoom=Math.max(3.5,Math.min(85,desiredZoom+e.deltaY*.025))},{passive:false});let pinch=0;canvas.addEventListener('touchmove',e=>{if(e.touches.length===2){let a=e.touches[0],b=e.touches[1],d=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);if(pinch)desiredZoom=Math.max(3.5,Math.min(85,desiredZoom+(pinch-d)*.06));pinch=d}},{passive:true});canvas.addEventListener('touchend',()=>pinch=0);
-$('resetView').onclick=resetCamera;buildStacks();render();tick();$('status').textContent='3D-Reifenstapel aktiv · 2 Wandreihen · 37 geprüfte Korrekturen';
-if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(rs=>Promise.all(rs.filter(r=>r.active&&r.active.scriptURL.includes('/sw.js')).map(r=>r.unregister()))).catch(()=>{});
+canvas.addEventListener('pointermove',e=>{if(!drag||e.pointerType==='touch'&&pinch)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;if(Math.abs(dx)+Math.abs(dy)>3)moved=true;rot-=dx*.007;tilt=Math.max(-.1,Math.min(1.25,tilt+dy*.005));lastX=e.clientX;lastY=e.clientY});
+canvas.addEventListener('pointerup',e=>{drag=false;if(moved)return;const rect=canvas.getBoundingClientRect();pointer.x=(e.clientX-rect.left)/rect.width*2-1;pointer.y=-(e.clientY-rect.top)/rect.height*2+1;raycaster.setFromCamera(pointer,camera);const hits=raycaster.intersectObjects(tireRoot.children,true);if(hits.length){let g=hits[0].object;while(g&&!g.userData.slot)g=g.parent;if(g)choose(g.userData.row,g.userData.slot)}});
+canvas.addEventListener('wheel',e=>{e.preventDefault();desiredZoom=Math.max(3.3,Math.min(75,desiredZoom+e.deltaY*.025))},{passive:false});
+canvas.addEventListener('touchmove',e=>{if(e.touches.length===2){moved=true;const a=e.touches[0],b=e.touches[1],d=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);if(pinch)desiredZoom=Math.max(3.3,Math.min(75,desiredZoom+(pinch-d)*.035));pinch=d}},{passive:true});
+canvas.addEventListener('touchend',()=>{pinch=0});
+$('resetView').onclick=resetCamera;
+if(typeof THREE==='undefined'){$('status').textContent='3D-Bibliothek konnte nicht geladen werden. Internetverbindung prüfen.'}
+else{init3d();render();$('status').textContent='Echte WebGL-3D-Reifen · 2 Wandreihen · 37 geprüfte Korrekturen';}
+if('serviceWorker' in navigator)navigator.serviceWorker.getRegistrations().then(rs=>Promise.all(rs.filter(r=>r.active&&r.active.scriptURL.includes('/sw.js')).map(r=>r.unregister()))).catch(()=>{});
+}
 </script></body></html>
